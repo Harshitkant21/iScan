@@ -692,7 +692,7 @@ struct MainView: View {
     @State private var navigateToProfileView: Bool = false
     @State private var isSheetVisible = false
     @State private var userSelectedAllergies: Set<String> = []
-    @StateObject private var appViewModel = AppViewModel()
+    @ObservedObject private var cameraCapture = CameraPhotoCapture()
 
     private let textContentTypes: [(title: String, textContentType: DataScannerViewController.TextContentType?)] = []
 
@@ -718,8 +718,9 @@ struct MainView: View {
             showAlert: $isAlertVisible,
             navigateToProfileView: $navigateToProfileView,
             recognizedDataType: vm.recognizedDataType,
-            recognizesMultipleItems: vm.recognizesMultipleItems
-//            userSelectedAllergies: $selectedAllergies
+            recognizesMultipleItems: vm.recognizesMultipleItems,
+            cameraCapture: cameraCapture,
+            userSelectedAllergies:userSelectedAllergies
         )
         .onAppear {
             // Set the default scan type to Text when the scanner view appears
