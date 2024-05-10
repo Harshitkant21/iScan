@@ -6,6 +6,7 @@ struct AllergyView: View {
     private var listOfAllergies = allergyData
     @State var searchText = ""
     @State private var navigateToContentView: Bool = false
+    @State private var selectedAllergies: Set<String> = []
     
     var body: some View {
         NavigationView {
@@ -19,6 +20,7 @@ struct AllergyView: View {
                             } else {
                                 selectedAllergies.insert(allergy.name)
                             }
+                            UserDefaults.standard.set(Array(selectedAllergies), forKey: "savedAllergies")
                         }
                 }
             }
@@ -43,16 +45,22 @@ struct AllergyView: View {
                     }
                     .background(
                         NavigationLink(destination: MainView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView) {
-                            // EmptyView()
                         }
                     )
                 }
                 
             }
         }
+        .onAppear(perform: loadSavedAllergies)
     }
     
-    @State private var selectedAllergies: Set<String> = [] // Set to store selected allergies
+    
+    private func loadSavedAllergies() {
+        if let savedAllergies = UserDefaults.standard.array(forKey: "savedAllergies") as? [String] {
+            print("Loaded saved allergies:", savedAllergies)
+          self.selectedAllergies = Set(savedAllergies)
+        }
+      }
     
     // Filter allergies
     var allergies: [Allergy] {

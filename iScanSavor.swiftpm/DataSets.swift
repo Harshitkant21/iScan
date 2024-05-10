@@ -1,17 +1,3 @@
-//
-//  DataSets.swift
-//  BarCodeScanner
-//
-//  Created by Aditya Gaba on 07/05/24.
-//
-
-//
-//  dataSets.swift
-//  preferences
-//
-//  Created by student on 07/05/24.
-//
-
 import Foundation
 struct Information: Identifiable, Hashable {
   let id = UUID()
