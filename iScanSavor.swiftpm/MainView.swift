@@ -719,8 +719,7 @@ struct MainView: View {
             navigateToProfileView: $navigateToProfileView,
             recognizedDataType: vm.recognizedDataType,
             recognizesMultipleItems: vm.recognizesMultipleItems,
-            cameraCapture: cameraCapture,
-            userSelectedAllergies:userSelectedAllergies
+            cameraCapture: cameraCapture
         )
         .onAppear {
             // Set the default scan type to Text when the scanner view appears

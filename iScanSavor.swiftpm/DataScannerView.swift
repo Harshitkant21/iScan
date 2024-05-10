@@ -480,7 +480,7 @@ struct DataScannerView: UIViewControllerRepresentable {
     let recognizedDataType: DataScannerViewController.RecognizedDataType
     let recognizesMultipleItems: Bool
     var cameraCapture: CameraPhotoCapture
-    let userSelectedAllergies: Set<String>
+//    let userSelectedAllergies: Set<String>
     
     
     func makeUIViewController(context: Context) -> DataScannerViewController {
@@ -503,52 +503,106 @@ struct DataScannerView: UIViewControllerRepresentable {
         }
     }
     
+//    func makeCoordinator() -> Coordinator {
+//        Coordinator(recognizedItems: $recognizedItems, showAlert: $showAlert, navigateToProfileView: $navigateToProfileView, cameraCapture: cameraCapture,userSelectedAllergies: userSelectedAllergies)
+//    }
     func makeCoordinator() -> Coordinator {
-        Coordinator(recognizedItems: $recognizedItems, showAlert: $showAlert, navigateToProfileView: $navigateToProfileView, cameraCapture: cameraCapture,userSelectedAllergies: userSelectedAllergies)
+        Coordinator(recognizedItems: $recognizedItems, showAlert: $showAlert, navigateToProfileView: $navigateToProfileView, cameraCapture: cameraCapture)
     }
-    
     class Coordinator: NSObject, DataScannerViewControllerDelegate {
         @Binding var recognizedItems: [RecognizedItem]
         @Binding var showAlert: Bool
         @Binding var navigateToProfileView: Bool
         var capturedImage: UIImage?
         var cameraCapture: CameraPhotoCapture
-        var userSelectedAllergies: Set<String>
+//        var userSelectedAllergies: Set<String>
         
-        init(recognizedItems: Binding<[RecognizedItem]>, showAlert: Binding<Bool>, navigateToProfileView: Binding<Bool>, cameraCapture: CameraPhotoCapture, userSelectedAllergies: Set<String>) {
+        init(recognizedItems: Binding<[RecognizedItem]>, showAlert: Binding<Bool>, navigateToProfileView: Binding<Bool>, cameraCapture: CameraPhotoCapture) {
             self._recognizedItems = recognizedItems
             self._showAlert = showAlert
             self._navigateToProfileView = navigateToProfileView
             self.cameraCapture = cameraCapture
-            self.userSelectedAllergies = userSelectedAllergies
             super.init()
         }
         
-        func dataScanner(_ dataScanner: DataScannerViewController, didTapOn item: RecognizedItem) {
-            print("didTapOn \(item)")
-        }
-
-        func filterIngredients(for allergy: String, userAllergies: Set<String>) -> [String]? {
-
-            guard let allergyInformation = InfotmationModel().getAllAllergyInformation().first(where: { $0.allergy == allergy && userAllergies.contains($0.allergy) }) else {
-                
-                return nil
-            }
-            
-            return allergyInformation.ingredients
-        }
-
+//        func dataScanner(_ dataScanner: DataScannerViewController, didTapOn item: RecognizedItem) {
+//            print("didTapOn \(item)")
+//        }
+//
+//        func filterIngredients(for allergy: String, userAllergies: Set<String>) -> [String]? {
+//
+//            guard let allergyInformation = InfotmationModel().getAllAllergyInformation().first(where: { $0.allergy == allergy && userAllergies.contains($0.allergy) }) else {
+//                
+//                return nil
+//            }
+//            
+//            return allergyInformation.ingredients
+//        }
+//        func filterIngredients(for allergy: String, userAllergies: Set<String>) -> [String] {
+//                    var filteredIngredients: [String] = []
+//                
+//                    for information in InfotmationModel().getAllAllergyInformation() {
+//
+//                        if information.allergy == allergy && userAllergies.contains(allergy) {
+//
+//                            filteredIngredients.append(contentsOf: information.ingredients)
+//                        }
+//                    }
+//                    
+//                    return filteredIngredients
+//                }
+//        func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
+//            UINotificationFeedbackGenerator().notificationOccurred(.success)
+//            recognizedItems.append(contentsOf: addedItems)
+//
+//            for allergy in userSelectedAllergies {
+//                if let allergyIngredients = filterIngredients(for: allergy, userAllergies: userSelectedAllergies) {
+//                    for item in addedItems {
+//                        switch item {
+//                        case .text(let text):
+//                            for ingredient in allergyIngredients {
+//                                if text.transcript.lowercased().contains(ingredient.lowercased()) {
+//                                    DispatchQueue.main.async {
+//                                        Task {
+//                                            do {
+//                                                let image = try await dataScanner.capturePhoto()
+//                                                let url = try FileManager.default
+//                                                    .url(for: .documentDirectory,
+//                                                         in: .userDomainMask,
+//                                                         appropriateFor: nil,
+//                                                         create: true)
+//                                                    .appendingPathComponent("preview.jpeg")
+//                                                if let data = image.jpegData(compressionQuality: 90) {
+//                                                    try data.write(to: url)
+//                                                }
+//                                                
+//                                                // Assign the captured image to cameraCapture
+//                                                self.cameraCapture.capturedImage = image
+//                                                self.navigateToProfileView = true
+//                                            } catch {
+//                                                print(error)
+//                                            }
+//                                        }
+//                                    }
+//                                    
+//                                    break
+//                                }
+//                            }
+//                        default:
+//                            break
+//                        }
+//                    }
+//                }
+//            }
+//        }
         func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            recognizedItems.append(contentsOf: addedItems)
-
-            for allergy in userSelectedAllergies {
-                if let allergyIngredients = filterIngredients(for: allergy, userAllergies: userSelectedAllergies) {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    recognizedItems.append(contentsOf: addedItems)
                     for item in addedItems {
                         switch item {
                         case .text(let text):
-                            for ingredient in allergyIngredients {
-                                if text.transcript.lowercased().contains(ingredient.lowercased()) {
+                            for ingredient in ingredients {
+                                if text.transcript.lowercased().contains(ingredient.name) {
                                     DispatchQueue.main.async {
                                         Task {
                                             do {
@@ -562,16 +616,17 @@ struct DataScannerView: UIViewControllerRepresentable {
                                                 if let data = image.jpegData(compressionQuality: 90) {
                                                     try data.write(to: url)
                                                 }
-                                                
-                                                // Assign the captured image to cameraCapture
+        
                                                 self.cameraCapture.capturedImage = image
                                                 self.navigateToProfileView = true
-                                            } catch {
+                                            }catch {
                                                 print(error)
                                             }
                                         }
+                                        //cameraCapture.captureScreenshot()
+                                        
                                     }
-                                    
+        
                                     break
                                 }
                             }
@@ -579,9 +634,8 @@ struct DataScannerView: UIViewControllerRepresentable {
                             break
                         }
                     }
+        
                 }
-            }
-        }
 
         func dataScanner(_ dataScanner: DataScannerViewController, didRemove removedItems: [RecognizedItem], allItems: [RecognizedItem]) {
             self.recognizedItems = recognizedItems.filter { item in
